@@ -133,7 +133,7 @@ export class FindOperations<
 		const partitionKeyValue = where[this.schema.partitionKeyField];
 		const id = where.id;
 
-		if (!id || !partitionKeyValue) {
+		if (!id || partitionKeyValue === undefined || partitionKeyValue === null) {
 			throw new Error("Both id and partition key are required for findUnique");
 		}
 
@@ -185,7 +185,7 @@ export class FindOperations<
 			aggregate,
 		} = args;
 
-		if (!partitionKey && !enableCrossPartitionQuery) {
+		if ((partitionKey === undefined || partitionKey === null) && !enableCrossPartitionQuery) {
 			throw new Error("Either partitionKey or enableCrossPartitionQuery must be provided");
 		}
 
