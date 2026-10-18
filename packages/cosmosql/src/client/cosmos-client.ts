@@ -141,7 +141,7 @@ export class CosmosClient {
 		enableCrossPartitionQuery?: boolean,
 		extraHeaders?: Record<string, string>,
 	): Promise<T> {
-		return this.requestWithRetry<T>(
+		let page = await this.requestWithRetry<T>(
 			method,
 			path,
 			body,
@@ -150,6 +150,29 @@ export class CosmosClient {
 			extraHeaders,
 			0,
 		);
+		const result = page.data as T & { Documents?: unknown[]; _count?: number };
+		if (!Array.isArray(result?.Documents)) {
+			return result;
+		}
+
+		while (page.continuation) {
+			page = await this.requestWithRetry<T>(
+				method,
+				path,
+				body,
+				partitionKey,
+				enableCrossPartitionQuery,
+				{ ...extraHeaders, "x-ms-continuation": page.continuation },
+				0,
+			);
+			const documents = (page.data as { Documents: unknown[] }).Documents;
+			for (const document of documents) {
+				result.Documents.push(document);
+			}
+			result._count = result.Documents.length;
+		}
+
+		return result;
 	}
 
 	/**
@@ -177,7 +200,7 @@ export class CosmosClient {
 		enableCrossPartitionQuery: boolean | undefined,
 		extraHeaders: Record<string, string> | undefined,
 		attempt: number,
-	): Promise<T> {
+	): Promise<{ data: T; continuation: string | null }> {
 		const date = new Date();
 		const [resourceType, resourceId] = this.parseResourcePath(path);
 
@@ -193,8 +216,13 @@ export class CosmosClient {
 
 		// Only add Content-Type for requests with body
 		if (body) {
-			// If the body has a 'query' property, this is a query request
-			if (typeof body === "object" && body !== null && "query" in body) {
+			if (
+				method === "POST" &&
+				path.endsWith("/docs") &&
+				typeof body === "object" &&
+				typeof body.query === "string" &&
+				!("id" in body)
+			) {
 				headers["content-type"] = "application/query+json";
 				headers["x-ms-documentdb-isquery"] = "true";
 			} else {
@@ -276,10 +304,18 @@ export class CosmosClient {
 
 			// HEAD and DELETE requests may not have body
 			if (method === "HEAD" || (method === "DELETE" && response.status === 204)) {
-				return {} as T;
+				return { data: {} as T, continuation: null };
 			}
 
-			return (await response.json()) as T;
+			let continuation: string | null = null;
+			if (
+				method === "POST" &&
+				path.endsWith("/docs") &&
+				headers["x-ms-documentdb-isquery"]?.toLowerCase() === "true"
+			) {
+				continuation = response.headers.get("x-ms-continuation");
+			}
+			return { data: (await response.json()) as T, continuation };
 		} catch (error) {
 			if (error instanceof CosmosError) {
 				throw error;
