@@ -45,7 +45,7 @@ const user = await db.users.create({
   },
   {
     name: "findUnique",
-    note: "point read, 1 RU",
+    note: "point read, one partition",
     code: `
 const user = await db.users.findUnique({
   where: { id: "u_1", email: "ada@lovelace.dev" },

@@ -282,7 +282,7 @@ function StatusBar({ phase }: { phase: Phase }) {
   if (isChecking) {
     verdict = "tsc --noEmit";
   } else if (isFixed) {
-    verdict = "point read · 1 RU";
+    verdict = "point read · one partition";
   }
 
   return (

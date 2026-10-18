@@ -98,12 +98,21 @@ export function CostLedger() {
         );
       })}
 
-      <div className="hidden grid-cols-[3rem_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.9fr)] border-t border-rule py-3 md:grid">
-        <span />
+      <div className="grid grid-cols-1 gap-4 border-t border-rule py-3 md:grid-cols-[3rem_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.9fr)] md:gap-0">
+        <span className="hidden md:block" />
         <span className="font-mono text-[11px] text-ink-3">
-          Typical for a 1 KB document. Scans grow with partition count.
+          Illustrative query costs. A 1 KB point read costs 1 RU with session,
+          consistent prefix or eventual consistency. Larger items cost more;
+          strong or bounded staleness consistency doubles read costs. Query
+          costs depend on the data, indexes and partitions scanned.{" "}
+          <a
+            href="https://learn.microsoft.com/en-us/azure/cosmos-db/optimize-cost-reads-writes"
+            className="underline underline-offset-2"
+          >
+            How Azure measures request costs
+          </a>
         </span>
-        <div className="relative mr-16 font-mono text-[11px] text-ink-3">
+        <div className="relative mr-16 hidden font-mono text-[11px] text-ink-3 md:block">
           {SCALE_TICKS.map((tick) => (
             <span
               key={tick}
@@ -114,7 +123,7 @@ export function CostLedger() {
             </span>
           ))}
         </div>
-        <span />
+        <span className="hidden md:block" />
       </div>
     </div>
   );

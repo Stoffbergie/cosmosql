@@ -24,7 +24,7 @@ const codeFont = JetBrains_Mono({
 });
 
 const description =
-  "Type-safe, zero-dependency TypeScript client for Azure Cosmos DB. Partition keys are enforced at compile time, so expensive queries never reach production.";
+  "Type-safe, zero-dependency TypeScript client for Azure Cosmos DB. Partition keys are enforced at compile time, and cross-partition queries require an explicit opt-in.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cosmosql.dev"),
