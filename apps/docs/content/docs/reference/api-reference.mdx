@@ -336,12 +336,12 @@ const stats = await db.orders.aggregate({
 
 **`groupBy(options)`**
 
-Group data and perform aggregations on each group.
+Group data within a partition and perform aggregations on each group. For aggregation across partitions, use the official Azure Cosmos DB SDK; see [query limitations](/docs/project-info/limitations#3-cross-partition-query-limitations).
 
 ```typescript
 const salesByCategory = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   _sum: { amount: true },
   _avg: { amount: true },

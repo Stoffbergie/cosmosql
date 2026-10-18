@@ -68,11 +68,11 @@ const searchResults = await db.products.findMany({
   where: {
     name: { contains: searchTerm },
     inventory: { gt: 0 }
-  },
-  orderBy: { price: 'asc' },
-  take: 50
+  }
 });
 ```
+
+Sorting or limiting search results across partitions requires the official Azure Cosmos DB SDK. See [query limitations](/docs/project-info/limitations#3-cross-partition-query-limitations).
 
 ## Inventory Management
 

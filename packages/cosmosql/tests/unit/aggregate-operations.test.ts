@@ -234,15 +234,13 @@ describe("AggregateOps", () => {
 		test("handles cross-partition query errors", async () => {
 			const ops = new AggregateOps(mockClient, schema);
 			const error = new Error("cross partition");
-			error.code = "CROSS_PARTITION_QUERY_ERROR";
 			mockClient.request.mockRejectedValue(error);
 
 			await expect(
 				ops.count({
 					enableCrossPartitionQuery: true,
 				}),
-			).rejects.toThrow("Cross-partition query failed");
+			).rejects.toBe(error);
 		});
 	});
 });
-

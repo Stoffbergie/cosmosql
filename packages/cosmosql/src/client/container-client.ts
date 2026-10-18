@@ -43,6 +43,9 @@ import type { CosmosClient } from "./cosmos-client";
  * - Aggregations (count, sum, avg, min, max, groupBy)
  * - Bulk operations (updateMany, deleteMany)
  *
+ * Stateful cross-partition queries require SDK query coordination. Use a partition key
+ * for sorting, pagination, and aggregations, or use the official Azure Cosmos DB SDK.
+ *
  * @template TSchema - The schema definition for documents in this container
  * @template TPartitionKey - The partition key field name from the schema
  *
@@ -155,7 +158,7 @@ export class ContainerClient<
 	 *   orderBy: { createdAt: 'desc' },
 	 *   take: 20,
 	 *   skip: 40,
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'tenant-123'
 	 * });
 	 *
 	 * // With field selection
@@ -172,7 +175,7 @@ export class ContainerClient<
 	 *     _avg: { age: true },
 	 *     _max: { lastLogin: true }
 	 *   },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'tenant-123'
 	 * });
 	 * // result = { data: [...], _count: 150, _avg: { age: 32.5 }, _max: { lastLogin: '...' } }
 	 * ```
@@ -395,7 +398,7 @@ export class ContainerClient<
 	 * // Count with filter
 	 * const adults = await db.users.count({
 	 *   where: { age: { gte: 18 } },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'active-users'
 	 * });
 	 * ```
 	 */
@@ -476,7 +479,7 @@ export class ContainerClient<
 	 *   by: 'status',
 	 *   _count: true,
 	 *   _sum: { amount: true },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'store-123'
 	 * });
 	 * // [
 	 * //   { status: 'pending', _count: 50, _sum: { amount: 5000 } },
@@ -488,7 +491,7 @@ export class ContainerClient<
 	 *   by: ['status', 'region'] as const,
 	 *   _count: true,
 	 *   _avg: { amount: true },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'store-123'
 	 * });
 	 * ```
 	 */
@@ -559,7 +562,7 @@ export class ContainerClient<
 	 * ```typescript
 	 * const avgAge = await db.users.avg('age', {
 	 *   where: { status: 'active' },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'tenant-123'
 	 * });
 	 * ```
 	 */
@@ -592,7 +595,7 @@ export class ContainerClient<
 	 *
 	 * const lowestPrice = await db.products.min('price', {
 	 *   where: { category: 'electronics' },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'electronics'
 	 * });
 	 * ```
 	 */
@@ -625,7 +628,7 @@ export class ContainerClient<
 	 *
 	 * const highestPrice = await db.products.max('price', {
 	 *   where: { category: 'electronics' },
-	 *   enableCrossPartitionQuery: true
+	 *   partitionKey: 'electronics'
 	 * });
 	 * ```
 	 */

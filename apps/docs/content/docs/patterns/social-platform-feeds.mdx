@@ -61,11 +61,11 @@ const globalFeed = await db.posts.findMany({
   enableCrossPartitionQuery: true,
   where: {
     createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
-  },
-  orderBy: { likes: 'desc' },
-  take: 100
+  }
 });
 ```
+
+For a ranked or paginated global feed, use the official Azure Cosmos DB SDK. See [query limitations](/docs/project-info/limitations#3-cross-partition-query-limitations).
 
 ## Engagement Tracking
 

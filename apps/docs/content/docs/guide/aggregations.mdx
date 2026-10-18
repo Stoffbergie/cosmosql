@@ -21,6 +21,8 @@ Complete guide to using aggregation functions in CosmosQL - count, sum, average,
 
 ## Overview
 
+Use `partitionKey` for CosmosQL aggregations. Aggregation across partitions can require SDK query coordination, which the direct REST client does not implement. Use the official Azure Cosmos DB SDK for that case; see [query limitations](/docs/project-info/limitations#3-cross-partition-query-limitations).
+
 CosmosQL provides a complete set of aggregation functions that are:
 - ✅ **Fully type-safe** - TypeScript infers exact result types
 - ✅ **SQL-compatible** - Translates to efficient Cosmos DB SQL
@@ -95,20 +97,7 @@ const recentHighValueCount = await db.orders.count({
 
 ### Cross-Partition Count
 
-⚠️ **Use sparingly** - Cross-partition queries are expensive in Cosmos DB.
-
-```typescript
-// Count ALL orders across all customers
-const totalOrders = await db.orders.count({
-  enableCrossPartitionQuery: true,
-});
-
-// Cross-partition count with filter
-const allCompletedOrders = await db.orders.count({
-  enableCrossPartitionQuery: true,
-  where: { status: 'completed' },
-});
-```
+For a count across partitions, use the official Azure Cosmos DB SDK. Setting `enableCrossPartitionQuery: true` does not add the SDK query coordination needed by stateful queries.
 
 ### Count Specific Fields
 
@@ -372,7 +361,7 @@ console.log(`Page 1 of ${totalPages}`);
 ```typescript
 const result = await db.products.findMany({
   where: { category: "electronics" },
-  enableCrossPartitionQuery: true,
+  partitionKey: 'electronics',
   aggregate: {
     _count: true,
     _avg: { price: true }
@@ -510,7 +499,7 @@ const salesSchema = container('sales', {
 // Sales by category
 const categoryStats = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   _sum: { amount: true, quantity: true },
   _avg: { amount: true },
@@ -539,10 +528,10 @@ for (const group of categoryStats) {
 Use an array to group by multiple fields:
 
 ```typescript
-// Sales by store AND category
+// Sales by store AND category within one store
 const detailedStats = await db.sales.groupBy({
   by: ['storeId', 'category'] as const,  // 'as const' for better type inference
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   _sum: { amount: true },
 });
@@ -571,7 +560,7 @@ Sort results by aggregation values:
 // Top categories by revenue
 const topCategories = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   _sum: { amount: true },
   orderBy: {
@@ -583,7 +572,7 @@ const topCategories = await db.sales.groupBy({
 // Categories with most transactions
 const popularCategories = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   orderBy: {
     _count: 'desc',
@@ -600,7 +589,7 @@ Grouped results are sorted and paginated in memory after the database query. `ta
 // Paginated category report
 const page1 = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _sum: { amount: true },
   orderBy: { category: 'asc' },
   take: 20,
@@ -609,7 +598,7 @@ const page1 = await db.sales.groupBy({
 
 const page2 = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _sum: { amount: true },
   orderBy: { category: 'asc' },
   take: 20,
@@ -642,10 +631,10 @@ const recentEvents = await db.analytics.groupBy({
   _avg: { duration: true },
 });
 
-// Cross-partition: Events by country for premium users
+// Purchase events by country for one user
 const countryStats = await db.analytics.groupBy({
   by: 'country',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'user-123',
   where: {
     eventType: 'purchase',
   },
@@ -768,7 +757,7 @@ const lastOrder: Date | null = stats._max.createdAt;
 // Single field grouping
 const result1 = await db.orders.groupBy({
   by: 'status',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'customer-123',
   _count: true,
   _sum: { amount: true },
 });
@@ -777,7 +766,7 @@ const result1 = await db.orders.groupBy({
 // Multiple field grouping
 const result2 = await db.orders.groupBy({
   by: ['customerId', 'status'] as const,
-  enableCrossPartitionQuery: true,
+  partitionKey: 'customer-123',
   _count: true,
 });
 // Type: Array<{ customerId: string; status: string; _count: number }>
@@ -883,11 +872,11 @@ async function getCustomerLTV(customerId: string) {
   };
 }
 
-// Sales by status report
-async function getSalesStatusReport() {
+// Sales by status for one customer
+async function getSalesStatusReport(customerId: string) {
   const statusReport = await db.orders.groupBy({
     by: 'status',
-    enableCrossPartitionQuery: true,
+    partitionKey: customerId,
     _count: true,
     _sum: { totalAmount: true, itemCount: true },
     _avg: { totalAmount: true },
@@ -901,25 +890,9 @@ async function getSalesStatusReport() {
     avgValue: group._avg.totalAmount || 0,
   }));
 }
-
-// Top customers
-async function getTopCustomers(limit: number = 10) {
-  const customers = await db.orders.groupBy({
-    by: 'customerId',
-    enableCrossPartitionQuery: true,
-    _count: true,
-    _sum: { totalAmount: true },
-    orderBy: { _sum_totalAmount: 'desc' },
-    take: limit,
-  });
-
-  return customers.map(c => ({
-    customerId: c.customerId,
-    orders: c._count,
-    spent: c._sum.totalAmount || 0,
-  }));
-}
 ```
+
+Global reports such as top customers across customer partitions require the official Azure Cosmos DB SDK.
 
 ### Analytics Platform
 
@@ -961,12 +934,12 @@ async function getUserEngagement(userId: string, days: number = 30) {
   };
 }
 
-// Platform-wide statistics
-async function getPlatformStats() {
+// Daily statistics for one user
+async function getDailyUserStats(userId: string) {
   // Events by type
   const eventTypes = await db.events.groupBy({
     by: 'eventType',
-    enableCrossPartitionQuery: true,
+    partitionKey: userId,
     where: {
       timestamp: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
     },
@@ -978,7 +951,7 @@ async function getPlatformStats() {
   // Page engagement
   const pages = await db.events.groupBy({
     by: 'page',
-    enableCrossPartitionQuery: true,
+    partitionKey: userId,
     where: {
       timestamp: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
     },
@@ -1075,7 +1048,7 @@ const count = await db.orders.count({
   partitionKey: 'customer-123',
 });
 
-// ⚠️ AVOID - Cross-partition query (slow & expensive)
+// Unsupported: cross-partition count needs SDK query coordination
 const count = await db.orders.count({
   enableCrossPartitionQuery: true,
 });
@@ -1131,7 +1104,7 @@ async function* getAllGroups() {
   while (true) {
     const page = await db.sales.groupBy({
       by: 'category',
-      enableCrossPartitionQuery: true,
+      partitionKey: 'store-123',
       _sum: { amount: true },
       take: pageSize,
       skip,
@@ -1147,7 +1120,7 @@ async function* getAllGroups() {
 ### ⚠️ AVOID: Unnecessary Cross-Partition Queries
 
 ```typescript
-// ❌ BAD - Expensive cross-partition query
+// Unsupported: cross-partition sum needs SDK query coordination
 const total = await db.orders.sum('amount', {
   enableCrossPartitionQuery: true,
 });
@@ -1161,13 +1134,13 @@ const total = await db.orders.sum('amount', {
 ```typescript
 // ❌ BAD - Scanning entire history
 const allTimeStats = await db.orders.aggregate({
-  enableCrossPartitionQuery: true,
+  partitionKey: 'customer-123',
   _sum: { amount: true },
 });
 
 // ✅ BETTER - Limit to relevant time period
 const recentStats = await db.orders.aggregate({
-  enableCrossPartitionQuery: true,
+  partitionKey: 'customer-123',
   where: {
     createdAt: { gte: new Date('2024-01-01') },
   },
@@ -1201,7 +1174,7 @@ Aggregation operations consume Request Units (RUs):
 
 - **Single Partition**: ~2-5 RUs (very efficient)
 - **Cross-Partition**: 5-100+ RUs depending on data size
-- **Group By**: Higher RU cost, especially cross-partition
+- **Group By**: Query cost grows with the documents grouped within the partition
 
 Monitor your RU consumption and optimize queries accordingly.
 
@@ -1237,7 +1210,7 @@ async function getOrderReport(customerId: string) {
 ```typescript
 const statusBreakdown = await db.orders.groupBy({
   by: 'status',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'customer-123',
   _count: true,
 });
 
@@ -1253,8 +1226,8 @@ const withPercentages = statusBreakdown.map(group => ({
 ### Time-Series Aggregations
 
 ```typescript
-// Daily sales for last 30 days
-async function getDailySales(days: number = 30) {
+// Daily sales for one customer over the last 30 days
+async function getDailySales(customerId: string, days: number = 30) {
   const results = [];
   
   for (let i = 0; i < days; i++) {
@@ -1264,7 +1237,7 @@ async function getDailySales(days: number = 30) {
     const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 
     const stats = await db.orders.aggregate({
-      enableCrossPartitionQuery: true,
+      partitionKey: customerId,
       where: {
         createdAt: { gte: startOfDay, lte: endOfDay },
         status: 'completed',

@@ -422,18 +422,6 @@ export class CosmosClient {
 				const body = JSON.parse(bodyText);
 				message = body.message || message;
 				code = body.code || code;
-
-				// Detect specific error types for better error messages
-				if (
-					code === "BadRequest" &&
-					(message.includes("cross partition") ||
-						message.includes("cannot be directly served by the gateway"))
-				) {
-					code = "CROSS_PARTITION_QUERY_ERROR";
-					message =
-						"Cross-partition queries cannot be served by the gateway, especially on empty containers. " +
-						"Use a partition key in your query or ensure the container has data before performing cross-partition queries.";
-				}
 			}
 		} catch {
 			// Ignore JSON parse errors
