@@ -471,10 +471,20 @@ npm run dev
 ```
 
 ### Testing
+
+From `packages/cosmosql`, run the offline unit tests:
+
 ```bash
-npm test
-npm run test:integration  # Requires CosmosDB emulator
+npm run test:unit
 ```
+
+Integration tests use a configured Cosmos DB instance and can create, update, and delete data:
+
+```bash
+npm run test:integration
+```
+
+The Azure authentication suite uses `COSMOSDB_CONNECTION_STRING` and is skipped when it is unset.
 
 ## Community
 
