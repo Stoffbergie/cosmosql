@@ -109,11 +109,10 @@ export function createClient(config: CosmosClientConfig & { migrations?: Migrati
 			}
 
 			// Step 2: Verify/create/update containers
-			const containerNames = new Set<string>();
+			const containerNames = new Set(Object.keys(containers));
 
 			if (mode !== "skip") {
 				for (const [name, schema] of Object.entries(containers)) {
-					containerNames.add(name);
 					await ensureContainer(client, name, schema as ContainerSchema<any, any, any>, mode);
 				}
 			}
