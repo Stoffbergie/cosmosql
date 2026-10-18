@@ -420,8 +420,9 @@ export class CosmosClient {
 			// Try to parse as JSON
 			if (bodyText) {
 				const body = JSON.parse(bodyText);
-				message = body.message || message;
-				code = body.code || code;
+				const firstDiagnostic = body.errors?.[0];
+				message = body.message || firstDiagnostic?.message || message;
+				code = body.code || firstDiagnostic?.code || code;
 			}
 		} catch {
 			// Ignore JSON parse errors
