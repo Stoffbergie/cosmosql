@@ -264,6 +264,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({}),
 			});
 
@@ -292,6 +293,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({}),
 			});
 
@@ -320,6 +322,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({}),
 			});
 
@@ -389,6 +392,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({}),
 			});
 
@@ -417,6 +421,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({ Documents: [] }),
 			});
 
@@ -446,6 +451,7 @@ describe("CosmosClient", () => {
 
 			(fetch as unknown as Mock).mockResolvedValueOnce({
 				ok: true,
+				headers: new Headers(),
 				json: async () => ({ Documents: [{ id: "1" }, { id: "2" }] }),
 			});
 
