@@ -1,6 +1,6 @@
 {
   "name": "cosmosql",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Type-safe, minimal ORM for Azure CosmosDB",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -49,7 +49,7 @@
   "homepage": "https://cosmosql.dev",
   "devDependencies": {
     "@azure/cosmos": "^4.7.0",
-    "@types/bun": "latest",
+    "@types/bun": "1.4.2",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
