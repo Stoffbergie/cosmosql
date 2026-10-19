@@ -27,7 +27,7 @@ export interface FindUniqueArgs<
 	S extends SelectInput<T> | undefined = undefined,
 > {
 	/** Where clause must include both ID and partition key */
-	where: { [K in PK]: T[K] } & Partial<T>;
+	where: { [K in PK]: T[K] } & { id: string } & Partial<T>;
 	/** Optional field projection to return only specific fields */
 	select?: S;
 }
