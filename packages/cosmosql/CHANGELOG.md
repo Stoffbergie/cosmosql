@@ -336,5 +336,5 @@ const result = await db.users.findMany({
 - Unit tests
 - Documentation and examples
 
-[GitHub](https://github.com/Stoffberg/cosmosql) | [Documentation](https://cosmosql.dev)
+[GitHub](https://github.com/Stoffbergie/cosmosql) | [Documentation](https://cosmosql.dev)
 
