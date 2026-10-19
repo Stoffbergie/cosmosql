@@ -5,6 +5,7 @@ import {
   Martian_Mono,
   Schibsted_Grotesk,
 } from "next/font/google";
+import { TAGLINE } from "@/lib/site";
 import "./global.css";
 
 const displayFont = Martian_Mono({
@@ -23,20 +24,17 @@ const codeFont = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-const description =
-  "Type-safe, zero-dependency TypeScript client for Azure Cosmos DB. Partition keys are enforced at compile time, and cross-partition queries require an explicit opt-in.";
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://cosmosql.dev"),
   title: {
-    default: "CosmosQL: type-safe Azure Cosmos DB for TypeScript",
+    default: `CosmosQL · ${TAGLINE}`,
     template: "%s | CosmosQL",
   },
-  description,
+  description: TAGLINE,
   openGraph: {
     siteName: "CosmosQL",
     type: "website",
-    description,
+    description: TAGLINE,
   },
   twitter: {
     card: "summary_large_image",

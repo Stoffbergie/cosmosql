@@ -1,6 +1,6 @@
 # CosmosQL
 
-> **Type-safe, zero-dependency library for Azure CosmosDB.** Catch expensive query mistakes at compile time, not when your bill arrives.
+> **Query Azure Cosmos DB with a type-safe, zero-dependency client.**
 
 [![npm version](https://badge.fury.io/js/cosmosql.svg)](https://www.npmjs.com/package/cosmosql)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

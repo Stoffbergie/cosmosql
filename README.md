@@ -1,6 +1,6 @@
 # CosmosQL
 
-Type-safe, zero-dependency client for Azure Cosmos DB. Partition keys are enforced by the type checker, and cross-partition queries require an explicit opt-in.
+Query Azure Cosmos DB with a type-safe, zero-dependency client. Partition keys are enforced by the type checker, and cross-partition queries require an explicit opt-in.
 
 [![npm version](https://img.shields.io/npm/v/cosmosql)](https://www.npmjs.com/package/cosmosql)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)

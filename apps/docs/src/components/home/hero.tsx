@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import { GITHUB_URL, QUICKSTART_URL } from "@/lib/site";
+import { GITHUB_URL, QUICKSTART_URL, TAGLINE_LINES } from "@/lib/site";
 import { HeroDemo } from "./hero-demo";
 import { InstallCommand } from "./install-command";
 
@@ -54,14 +54,24 @@ export function Hero() {
 
         <h1
           id="hero-title"
-          className="mt-7 font-display text-[clamp(40px,7.4vw,96px)] font-medium leading-[0.98] tracking-[-0.045em] font-stretch-condensed text-ink"
+          className="mt-7 font-display text-[clamp(40px,6.2vw,80px)] font-medium leading-[0.98] tracking-[-0.045em] font-stretch-condensed text-ink"
         >
-          <HeadlineLine number="01" delayMs={80}>
-            Your Cosmos DB bill,
-          </HeadlineLine>
-          <HeadlineLine number="02" delayMs={170}>
-            type-checked<span className="text-signal">.</span>
-          </HeadlineLine>
+          {TAGLINE_LINES.map((line, index) => (
+            <HeadlineLine
+              key={line}
+              number={String(index + 1).padStart(2, "0")}
+              delayMs={80 + index * 90}
+            >
+              {line.endsWith(".") ? (
+                <>
+                  {line.slice(0, -1)}
+                  <span className="text-signal">.</span>
+                </>
+              ) : (
+                line
+              )}
+            </HeadlineLine>
+          ))}
         </h1>
 
         <div className="mt-14 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
