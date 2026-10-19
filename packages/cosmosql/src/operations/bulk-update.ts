@@ -71,7 +71,7 @@ export class BulkUpdateOperations<
 		} = options;
 
 		// Validation
-		if (!partitionKey && !enableCrossPartitionQuery) {
+		if ((partitionKey === undefined || partitionKey === null) && !enableCrossPartitionQuery) {
 			throw new Error(
 				"Either partitionKey or enableCrossPartitionQuery must be specified for bulk operations",
 			);

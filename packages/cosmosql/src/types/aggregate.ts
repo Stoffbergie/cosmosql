@@ -37,7 +37,7 @@ export type AggregateResult<T, Ops extends AggregateOperations<T>> = {
 
 // Count options
 export interface CountOptions<T> {
-	partitionKey?: string | string[];
+	partitionKey?: string | number | boolean | (string | number | boolean)[];
 	enableCrossPartitionQuery?: boolean;
 	where?: WhereInput<T>;
 }
@@ -50,7 +50,7 @@ export type ExtractAggregateOps<_T, Opts> = Pick<
 
 // Aggregate options with operations inline
 export type AggregateOptions<T> = {
-	partitionKey?: string | string[];
+	partitionKey?: string | number | boolean | (string | number | boolean)[];
 	enableCrossPartitionQuery?: boolean;
 	where?: WhereInput<T>;
 	_count?: true | { select?: Partial<Record<keyof T, true>> };
@@ -63,7 +63,7 @@ export type AggregateOptions<T> = {
 // Group by options with operations inline
 export type GroupByOptions<T, By extends keyof T | readonly (keyof T)[]> = {
 	by: By;
-	partitionKey?: string | string[];
+	partitionKey?: string | number | boolean | (string | number | boolean)[];
 	enableCrossPartitionQuery?: boolean;
 	where?: WhereInput<T>;
 	_count?: true | { select?: Partial<Record<keyof T, true>> };

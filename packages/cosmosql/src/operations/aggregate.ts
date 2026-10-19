@@ -288,7 +288,10 @@ export class AggregateOps<
 		partitionKey?: any;
 		enableCrossPartitionQuery?: boolean;
 	}) {
-		if (!options.partitionKey && !options.enableCrossPartitionQuery) {
+		if (
+			(options.partitionKey === undefined || options.partitionKey === null) &&
+			!options.enableCrossPartitionQuery
+		) {
 			throw new Error(
 				"PARTITION KEY REQUIRED\n\n" +
 					"Aggregation operations require a partition key to avoid expensive cross-partition queries.\n\n" +
@@ -310,7 +313,7 @@ export class AggregateOps<
 	private async executeQuery<R = any>(options: {
 		sql: string;
 		parameters: Array<{ name: string; value: any }>;
-		partitionKey?: string | string[];
+		partitionKey?: string | number | boolean | (string | number | boolean)[];
 		enableCrossPartitionQuery?: boolean;
 	}): Promise<R[]> {
 		const path = `/dbs/${this.client.getDatabase()}/colls/${this.schema.name}/docs`;
