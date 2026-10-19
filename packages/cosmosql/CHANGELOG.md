@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-10-19
+
+### Changed
+- `findUnique` now requires both the document ID and partition key in TypeScript. Add `id` to calls that previously omitted it.
+
+### Fixed
+- Queries now follow continuation pages instead of silently returning incomplete results.
+- Point operations accept zero and empty-string partition keys.
+- Configured containers remain available when verification is skipped and inside migration callbacks.
+- Grouped query results are sorted and paginated after grouping.
+- Cosmos DB errors retain their status, code, and diagnostic message, including nested query errors.
+
+### Documentation
+- Updated repository links after the move to `Stoffbergie/cosmosql`.
+- Clarified request costs and the REST gateway limitations that require partition-scoped queries or the official Azure Cosmos DB SDK.
+
 ## [0.9.0] - 2025-11-04
 
 ### Added - Bulk Operations
