@@ -1,7 +1,7 @@
 {
   "name": "cosmosql",
   "version": "0.10.0",
-  "description": "Type-safe, minimal ORM for Azure CosmosDB",
+  "description": "Query Azure Cosmos DB with a type-safe, zero-dependency client.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
