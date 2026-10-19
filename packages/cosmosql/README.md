@@ -217,13 +217,11 @@ const result = await db.users.query<{ count: number }>({
 
 ### Cost Comparison
 
-| Query Type | RU Cost | Monthly Cost (1M queries) |
-|------------|---------|---------------------------|
-| Point read (with partition key) | 1 RU | $24 |
-| Partition query | 3-5 RU | $72-120 |
-| Cross-partition query | 100 RU | $2,400 |
+A point read of a 1 KB item costs 1 RU with session, consistent prefix or eventual consistency. Larger items cost more; strong or bounded staleness consistency doubles read costs. Query costs depend on the data, indexes and partitions scanned. The 1 RU examples in this README assume a 1 KB item and one of those weaker consistency levels.
 
-**CosmosQL prevents expensive cross-partition queries at compile time.**
+Measure the request charge for your workload rather than assuming a fixed query cost. See [Azure Cosmos DB request costs](https://learn.microsoft.com/en-us/azure/cosmos-db/optimize-cost-reads-writes).
+
+**CosmosQL requires an explicit opt-in for cross-partition queries.**
 
 ### Bundle Size
 - **CosmosQL**: 43.6 kB packed

@@ -47,7 +47,7 @@ const PANELS = [
   },
   {
     name: "cosmosql",
-    verdict: "Point read. One partition, 1 RU.",
+    verdict: "Point read. One partition.",
     code: COSMOSQL_CODE,
     facts: [
       { label: "Result type", value: "inferred from your schema" },

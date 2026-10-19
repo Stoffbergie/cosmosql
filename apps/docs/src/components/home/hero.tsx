@@ -6,7 +6,7 @@ import { InstallCommand } from "./install-command";
 
 const SPEC_CELLS = [
   { value: "0", label: "runtime dependencies" },
-  { value: "1 RU", label: "per point read" },
+  { value: "1 RU+", label: "per point read" },
   { value: "TS 5+", label: "types from your schema" },
   { value: "Node 18+", label: "and Bun 1.0+" },
   { value: "MIT", label: "open source" },
@@ -68,9 +68,9 @@ export function Hero() {
           <div className="rise flex flex-col gap-8" style={delay(320)}>
             <p className="max-w-[30rem] text-pretty text-[18px] leading-relaxed text-ink-2">
               CosmosQL turns your schema into types and your partition key into
-              a compile-time requirement. Point reads stay at 1 RU, scans across
-              partitions are opt-in, and the package ships with zero runtime
-              dependencies.
+              a compile-time requirement. Point reads start at 1 RU, scans
+              across partitions are opt-in, and the package ships with zero
+              runtime dependencies.
             </p>
             <InstallCommand />
             <div className="flex flex-wrap gap-3">
