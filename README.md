@@ -52,6 +52,8 @@ bun run lint         # Biome across the repo
 
 Run a script in one workspace with `bun run --filter <name> <script>`, for example `bun run --filter cosmosql test:integration`.
 
+Integration tests use a configured Cosmos DB instance and can create, update, and delete data. The Azure authentication suite uses `COSMOSDB_CONNECTION_STRING` and is skipped when it is unset.
+
 ## Releasing
 
 Publishing a GitHub release publishes `packages/cosmosql` to npm with provenance.

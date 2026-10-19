@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { container, createClient, field } from "../../src/index";
 
 /**
@@ -28,25 +28,10 @@ const testContainer = container("testcontainer", {
  * To run these tests, set the COSMOSDB_CONNECTION_STRING environment variable
  * to a valid Azure CosmosDB connection string.
  */
-describe("cosmosql Azure CosmosDB auth", () => {
-	const connectionString = process.env.COSMOSDB_CONNECTION_STRING;
+const connectionString = process.env.COSMOSDB_CONNECTION_STRING;
 
-	// Skip tests if no connection string is provided
-	beforeAll(() => {
-		if (!connectionString) {
-			console.warn("Skipping Azure CosmosDB integration tests: COSMOSDB_CONNECTION_STRING not set");
-		}
-	});
-
-	// Helper function to check if we have a connection string
-	const hasConnectionString = () => !!connectionString;
-
+describe.skipIf(!connectionString)("cosmosql Azure CosmosDB auth", () => {
 	it("should successfully query documents with proper auth", async () => {
-		if (!hasConnectionString()) {
-			console.warn("Skipping test: no COSMOSDB_CONNECTION_STRING");
-			return;
-		}
-
 		const client = await createClient({
 			connectionString: connectionString,
 			database: "testdb",
@@ -74,11 +59,6 @@ describe("cosmosql Azure CosmosDB auth", () => {
 	});
 
 	it("should successfully perform cross-partition queries", async () => {
-		if (!hasConnectionString()) {
-			console.warn("Skipping test: no COSMOSDB_CONNECTION_STRING");
-			return;
-		}
-
 		const client = await createClient({
 			connectionString: connectionString,
 			database: "testdb",
@@ -106,11 +86,6 @@ describe("cosmosql Azure CosmosDB auth", () => {
 	});
 
 	it("should handle create operations with proper auth", async () => {
-		if (!hasConnectionString()) {
-			console.warn("Skipping test: no COSMOSDB_CONNECTION_STRING");
-			return;
-		}
-
 		const client = await createClient({
 			connectionString: connectionString,
 			database: "testdb",
@@ -140,11 +115,6 @@ describe("cosmosql Azure CosmosDB auth", () => {
 	});
 
 	it("should handle update operations with proper auth", async () => {
-		if (!hasConnectionString()) {
-			console.warn("Skipping test: no COSMOSDB_CONNECTION_STRING");
-			return;
-		}
-
 		const client = await createClient({
 			connectionString: connectionString,
 			database: "testdb",
@@ -172,11 +142,6 @@ describe("cosmosql Azure CosmosDB auth", () => {
 	});
 
 	it("should handle delete operations with proper auth", async () => {
-		if (!hasConnectionString()) {
-			console.warn("Skipping test: no COSMOSDB_CONNECTION_STRING");
-			return;
-		}
-
 		const client = await createClient({
 			connectionString: connectionString,
 			database: "testdb",
