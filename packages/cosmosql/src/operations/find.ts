@@ -217,112 +217,82 @@ export class FindOperations<
 			const { query, parameters } = builder.build();
 			const path = `/dbs/${this.client.getDatabase()}/colls/${this.schema.name}/docs`;
 
-			try {
-				const result = await this.client.request(
-					"POST",
-					path,
-					{
-						query,
-						parameters,
-					},
-					partitionKey,
-					enableCrossPartitionQuery,
-				);
+			const result = await this.client.request(
+				"POST",
+				path,
+				{
+					query,
+					parameters,
+				},
+				partitionKey,
+				enableCrossPartitionQuery,
+			);
 
-				return (result.Documents || []) as any;
-			} catch (error: any) {
-				// Provide better error message for cross-partition query errors
-				if (
-					error.code === "CROSS_PARTITION_QUERY_ERROR" ||
-					error.message?.includes("cross partition")
-				) {
-					throw new Error(
-						`Cross-partition query failed: ${error.message}. ` +
-							"This often occurs with empty containers. Consider using a partition key instead, " +
-							"or ensure the container has data before performing cross-partition queries.",
-					);
-				}
-				throw error;
-			}
+			return (result.Documents || []) as any;
 		}
 
 		// With aggregation, we need to execute both queries
 		const path = `/dbs/${this.client.getDatabase()}/colls/${this.schema.name}/docs`;
 
-		try {
-			// Execute data query
-			const builder = new QueryBuilder<InferSchema<TSchema>>();
+		// Execute data query
+		const builder = new QueryBuilder<InferSchema<TSchema>>();
 
-			if (select) {
-				const fields = Object.keys(select);
-				builder.select(fields);
-			}
-
-			if (where) {
-				builder.where(where);
-			}
-
-			if (orderBy) {
-				builder.orderBy(orderBy);
-			}
-
-			if (take) {
-				builder.take(take);
-			}
-
-			if (skip) {
-				builder.skip(skip);
-			}
-
-			const { query, parameters } = builder.build();
-
-			// Execute aggregate query
-			const { sql: aggSql, parameters: aggParams } = this.aggregateBuilder.buildAggregate({
-				where,
-				...aggregate,
-			});
-
-			// Execute both queries in parallel
-			const [dataResult, aggResult] = await Promise.all([
-				this.client.request(
-					"POST",
-					path,
-					{ query, parameters },
-					partitionKey,
-					enableCrossPartitionQuery,
-				),
-				this.client.request(
-					"POST",
-					path,
-					{ query: aggSql, parameters: aggParams },
-					partitionKey,
-					enableCrossPartitionQuery,
-				),
-			]);
-
-			const data = dataResult.Documents || [];
-			const rawAggResult = (Array.isArray(aggResult) ? aggResult : aggResult.Documents)?.[0] ?? {};
-			const aggregations = this.resultParser.parseAggregateResult(rawAggResult, aggregate);
-
-			// Combine into result
-			return {
-				data,
-				...aggregations,
-			} as any;
-		} catch (error: any) {
-			// Provide better error message for cross-partition query errors
-			if (
-				error.code === "CROSS_PARTITION_QUERY_ERROR" ||
-				error.message?.includes("cross partition")
-			) {
-				throw new Error(
-					`Cross-partition query failed: ${error.message}. ` +
-						"This often occurs with empty containers. Consider using a partition key instead, " +
-						"or ensure the container has data before performing cross-partition queries.",
-				);
-			}
-			throw error;
+		if (select) {
+			const fields = Object.keys(select);
+			builder.select(fields);
 		}
+
+		if (where) {
+			builder.where(where);
+		}
+
+		if (orderBy) {
+			builder.orderBy(orderBy);
+		}
+
+		if (take) {
+			builder.take(take);
+		}
+
+		if (skip) {
+			builder.skip(skip);
+		}
+
+		const { query, parameters } = builder.build();
+
+		// Execute aggregate query
+		const { sql: aggSql, parameters: aggParams } = this.aggregateBuilder.buildAggregate({
+			where,
+			...aggregate,
+		});
+
+		// Execute both queries in parallel
+		const [dataResult, aggResult] = await Promise.all([
+			this.client.request(
+				"POST",
+				path,
+				{ query, parameters },
+				partitionKey,
+				enableCrossPartitionQuery,
+			),
+			this.client.request(
+				"POST",
+				path,
+				{ query: aggSql, parameters: aggParams },
+				partitionKey,
+				enableCrossPartitionQuery,
+			),
+		]);
+
+		const data = dataResult.Documents || [];
+		const rawAggResult = (Array.isArray(aggResult) ? aggResult : aggResult.Documents)?.[0] ?? {};
+		const aggregations = this.resultParser.parseAggregateResult(rawAggResult, aggregate);
+
+		// Combine into result
+		return {
+			data,
+			...aggregations,
+		} as any;
 	}
 
 	/**

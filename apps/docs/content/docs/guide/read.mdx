@@ -143,13 +143,11 @@ const recentUsers = await db.users.findMany({
   enableCrossPartitionQuery: true, // Must be explicit
   where: {
     createdAt: { gte: new Date('2024-01-01') }
-  },
-  orderBy: { createdAt: 'desc' },
-  take: 20
+  }
 });
 ```
 
-**When to use**: Admin dashboards, analytics, reports—not user-facing queries.
+This direct REST query supports filtering and projection. For sorting, pagination, or aggregation across partitions, use the official Azure Cosmos DB SDK. See [query limitations](/docs/project-info/limitations#3-cross-partition-query-limitations).
 
 ## Selecting Specific Fields
 

@@ -195,13 +195,15 @@ const stats = await db.users.aggregate({
 // Group by operations
 const categoryStats = await db.sales.groupBy({
   by: 'category',
-  enableCrossPartitionQuery: true,
+  partitionKey: 'store-123',
   _count: true,
   _sum: { amount: true },
   orderBy: { _sum_amount: 'desc' },
   take: 10
 });
 ```
+
+Cross-partition filters and projections can use the REST gateway. Sorting, pagination, and aggregations across partitions can require SDK query coordination, which CosmosQL does not implement. Use a partition key or the official Azure Cosmos DB SDK; see the [REST query limitations](https://learn.microsoft.com/en-us/rest/api/cosmos-db/querying-cosmosdb-resources-using-the-rest-api#queries-that-cannot-be-served-by-gateway).
 
 ### Raw SQL Queries
 

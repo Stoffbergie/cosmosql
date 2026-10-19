@@ -92,11 +92,11 @@ await db.posts.createMany({
 
 #### 3. Cross-Partition Query Limitations
 
-**Azure CosmosDB Restriction:** Cross-partition queries are limited on empty containers. This is a CosmosDB limitation, not a CosmosQL limitation.
+CosmosQL sends queries directly to the Cosmos DB REST gateway. Cross-partition filters and projections are supported. Queries scoped with `partitionKey`, or routed by Cosmos DB to one partition through a partition-key equality filter, can use that partition's query execution.
 
-When attempting cross-partition queries on empty containers, CosmosDB returns an error. This is by design to prevent expensive operations on empty data.
+Cross-partition queries that need state across continuations, including `ORDER BY`, `TOP`, `OFFSET LIMIT`, aggregates, `DISTINCT`, and `GROUP BY`, require SDK query coordination. CosmosQL does not implement that coordination, so the gateway can return HTTP 400 `BadRequest`. Adding documents does not resolve this query limitation.
 
-**Workaround:** Ensure containers have at least one document before running cross-partition queries, or use partition-scoped queries when possible.
+Use a partition-scoped query or the official Azure Cosmos DB SDK for these operations across partitions. See Microsoft's [REST query limitations](https://learn.microsoft.com/en-us/rest/api/cosmos-db/querying-cosmosdb-resources-using-the-rest-api#queries-that-cannot-be-served-by-gateway).
 
 #### 4. Advanced Query Features
 

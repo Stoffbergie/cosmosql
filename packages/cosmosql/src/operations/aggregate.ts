@@ -318,36 +318,21 @@ export class AggregateOps<
 	}): Promise<R[]> {
 		const path = `/dbs/${this.client.getDatabase()}/colls/${this.schema.name}/docs`;
 
-		try {
-			const result = await this.client.request(
-				"POST",
-				path,
-				{
-					query: options.sql,
-					parameters: options.parameters,
-				},
-				options.partitionKey,
-				options.enableCrossPartitionQuery,
-			);
+		const result = await this.client.request(
+			"POST",
+			path,
+			{
+				query: options.sql,
+				parameters: options.parameters,
+			},
+			options.partitionKey,
+			options.enableCrossPartitionQuery,
+		);
 
-			// SELECT VALUE returns array directly, SELECT returns { Documents: [...] }
-			if (Array.isArray(result)) {
-				return result;
-			}
-			return result.Documents || [];
-		} catch (error: any) {
-			// Provide better error message for cross-partition query errors
-			if (
-				error.code === "CROSS_PARTITION_QUERY_ERROR" ||
-				error.message?.includes("cross partition")
-			) {
-				throw new Error(
-					`Cross-partition query failed: ${error.message}. ` +
-						"This often occurs with empty containers. Consider using a partition key instead, " +
-						"or ensure the container has data before performing cross-partition queries.",
-				);
-			}
-			throw error;
+		// SELECT VALUE returns array directly, SELECT returns { Documents: [...] }
+		if (Array.isArray(result)) {
+			return result;
 		}
+		return result.Documents || [];
 	}
 }
